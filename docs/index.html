@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>openGSMTower — GSM base-station simulator</title>
+<meta name="description" content="openGSMTower synthesizes the classic GSM TDMA buzz and true RF-rate GMSK captures: 7 bands, tower-close mode, SDR waterfall scenes.">
+<link rel="icon" type="image/png" href="OpenGSMTowerNEW.png">
+<style>
+  :root{
+    --bg:#101419; --panel:#0b0f14; --line:#2a3542; --txt:#d7e3f4;
+    --dim:#8b98a9; --grn:#35d07f; --cyn:#7df9ff; --amb:#ffd479;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:Consolas,"Cascadia Mono",Menlo,monospace;line-height:1.55}
+  a{color:var(--cyn)}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 22px}
+  nav{position:sticky;top:0;background:rgba(16,20,25,.94);border-bottom:1px solid var(--line);z-index:10}
+  nav .wrap{display:flex;align-items:center;gap:18px;padding:12px 22px}
+  nav img{width:30px;height:30px;border-radius:6px}
+  nav b{color:var(--grn);letter-spacing:.5px}
+  nav .sp{flex:1}
+  nav a.nlink{color:var(--dim);text-decoration:none;font-size:14px;margin-left:16px}
+  nav a.nlink:hover{color:var(--txt)}
+  header.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:center;padding:64px 0 46px}
+  header.hero img{width:100%;border-radius:14px;border:1px solid var(--line)}
+  h1{font-size:42px;margin:0 0 10px;color:#fff}
+  h1 span{color:var(--grn)}
+  .tag{color:var(--dim);font-size:17px;margin:0 0 24px}
+  .btn{display:inline-block;padding:12px 22px;border-radius:9px;font-weight:bold;
+    text-decoration:none;margin:0 12px 12px 0;font-size:15px}
+  .btn.g{background:var(--grn);color:#062b16}
+  .btn.o{border:1px solid var(--line);color:var(--txt)}
+  .btn.o:hover{border-color:var(--grn)}
+  .term{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;font-size:13.5px;white-space:pre-wrap;margin-top:18px}
+  .term .g{color:var(--grn)} .term .d{color:var(--dim)}
+  section{padding:40px 0;border-top:1px solid var(--line)}
+  h2{color:var(--cyn);font-size:24px;margin:0 0 18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .card h3{margin:0 0 8px;font-size:15px;color:var(--grn)}
+  .card p{margin:0;font-size:13.5px;color:var(--dim)}
+  .specs{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .spec{border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:13px}
+  .spec b{color:var(--amb)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--grn)} td{color:var(--dim)}
+  td:first-child{color:var(--txt)}
+  code{background:#00000055;padding:2px 7px;border-radius:6px;color:var(--amb);font-size:13px}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px;overflow-x:auto;font-size:13px;color:var(--txt)}
+  .demo{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+  .demo .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+  .demo button{background:var(--grn);color:#062b16;border:0;border-radius:8px;
+    padding:10px 20px;font-family:inherit;font-weight:bold;cursor:pointer}
+  .demo button.stop{background:#ff6b6b;color:#3a0a0a}
+  .demo button.band{background:#1c2530;color:var(--txt);border:1px solid var(--line)}
+  .demo button.band.on{border-color:var(--grn);color:var(--grn)}
+  .demo input[type=range]{accent-color:var(--grn)}
+  .demo small{color:var(--dim)}
+  footer{padding:30px 0 50px;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+  @media(max-width:760px){header.hero{grid-template-columns:1fr}h1{font-size:32px}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <img src="OpenGSMTowerNEW.png" alt="openGSMTower icon">
+  <b>openGSMTower</b>
+  <span class="sp"></span>
+  <a class="nlink" href="#demo">Listen</a>
+  <a class="nlink" href="#features">Features</a>
+  <a class="nlink" href="#sdr">SDR guide</a>
+  <a class="nlink" href="#download">Download</a>
+  <a class="nlink" href="#build">Build</a>
+</div></nav>
+
+<div class="wrap">
+<header class="hero">
+  <div>
+    <h1>open<span>GSM</span>Tower</h1>
+    <p class="tag">The GSM base-station simulator — the 217&nbsp;Hz TDMA buzz,
+    seven bands with their own voices, and RF-rate GMSK captures that look
+    like a real tower in your SDR waterfall.</p>
+    <a class="btn g" href="#download">Download for Windows</a>
+    <a class="btn o" href="#demo">Hear it in your browser</a>
+    <div class="term"><span class="d">$ openGSMTower.exe --test-synth</span>
+peak217=495.0 off=201.7 ratio=2.45
+<span class="g">PASS</span> · <span class="g">IQ-PASS</span> · <span class="g">WIDE-PASS</span> · <span class="g">BAND-PASS</span> · <span class="g">SCENE-PASS</span> · <span class="g">LIVE-PASS</span></div>
+  </div>
+  <img src="OpenGSMTowerNEW.png" alt="GSM tower artwork">
+</header>
+
+<section id="demo">
+  <h2>// 01 — listen live</h2>
+  <div class="demo">
+    <p style="margin-top:0">A tiny WebAudio sketch of the engine: gated noise at the
+    real 216.7 Hz frame rate plus slot-rate ring. Pick a band — 450 is dark and
+    mainsy, 1900 is bright and whiny. <small>(Keep volume low.)</small></p>
+    <div class="row">
+      <button id="playBtn">Play buzz</button>
+      <button class="band on" data-f="900"  data-b="1800">GSM-900</button>
+      <button class="band" data-f="500"  data-b="900">GSM-450</button>
+      <button class="band" data-f="3200" data-b="2600">PCS-1900</button>
+    </div>
+    <div class="row">
+      <small>Volume</small>
+      <input id="vol" type="range" min="0" max="100" value="30" style="width:200px">
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <h2>// 02 — features</h2>
+  <div class="grid">
+    <div class="card"><h3>True TDMA engine</h3><p>8 slots per 4.615 ms frame, BCCH slot 0 always on, 26-multiframe idle rhythm, 28 us PA ramps — the buzz, not a beep.</p></div>
+    <div class="card"><h3>7 bands, 7 voices</h3><p>450 / 480 / 850 / 900 / R / 1800 / 1900 with real UL/DL ranges, per-band hash EQ, mains hum and PSU whine.</p></div>
+    <div class="card"><h3>Tower-close mode</h3><p>Proximity presets, SDR drive with soft clipping, solid-BCCH dummy bursts: from −109 dBm hairline to full-scale carrier.</p></div>
+    <div class="card"><h3>IQ export</h3><p>1.083 MS/s GMSK with FCCH/SCH/BCCH structure for SDR++ file source (.cu8 + IQ WAV).</p></div>
+    <div class="card"><h3>Width / TRX / Scene</h3><p>BT + ramp control, up to 4 carriers on the 200 kHz raster, Clean tower or Dense urban 900 scenes.</p></div>
+    <div class="card"><h3>C++ disguise</h3><p>Ships as <code>.cpp</code> — compiles as C++ into a stub, runs as Python. The exe needs no Python at all.</p></div>
+  </div>
+  <div class="specs" style="margin-top:18px">
+    <span class="spec">frame <b>216.7 Hz</b></span>
+    <span class="spec">slot <b>577 us</b></span>
+    <span class="spec">GMSK <b>BT=0.3</b> @ 270.8 kBd</span>
+    <span class="spec">channel <b>200 kHz</b></span>
+    <span class="spec">IQ <b>1083333 Hz</b></span>
+  </div>
+</section>
+
+<section id="sdr">
+  <h2>// 03 — sdr guide</h2>
+  <table>
+    <tr><th>Recipe</th><th>Width</th><th>TRX</th><th>Scene</th><th>Result</th></tr>
+    <tr><td>Authentic tower</td><td>Normal</td><td>1</td><td>Clean tower</td><td>Spec-correct 200 kHz carrier</td></tr>
+    <tr><td>Dense urban 900</td><td>Wide</td><td>2–3</td><td>Dense urban 900</td><td>Beacon spike + comb + strays</td></tr>
+    <tr><td>Full firehose</td><td>XXL Splatter</td><td>4</td><td>Dense urban 900</td><td>Maximum spray (off-spec)</td></tr>
+  </table>
+  <p style="color:var(--dim);font-size:14px">Live cable tops out at ±24 kHz
+  (urban scene adds a 19 kHz pilot + stray tones there). For the full ±150 kHz
+  view, replay the exported IQ. View GSM with a ~200 kHz filter, not a narrow
+  AM slice.</p>
+</section>
+
+<section id="download">
+  <h2>// 04 — download</h2>
+  <p>Grab <code>openGSMTower.exe</code> from the repo releases — standalone,
+  no Python needed. First launch shows the AS-IS license gate, then pick your
+  output device <em>before</em> pressing Start.</p>
+  <a class="btn g" href="#">Get openGSMTower.exe</a>
+  <a class="btn o" href="#build">Build it yourself</a>
+</section>
+
+<section id="build">
+  <h2>// 05 — build from source</h2>
+  <pre>pip install pyinstaller numpy scipy matplotlib sounddevice
+copy openGSMTower.cpp openGSMTower_app.py
+python -m PyInstaller --noconfirm --clean --onefile --windowed --name openGSMTower ^
+  --icon openGSMTower.ico --add-data "openGSMTower.ico;." ^
+  --hidden-import sounddevice --hidden-import scipy.signal ^
+  --hidden-import scipy.special --collect-all sounddevice openGSMTower_app.py</pre>
+  <p style="color:var(--dim);font-size:14px">Or run from source directly:
+  <code>python openGSMTower.cpp</code> (flags: <code>--test-synth</code>,
+  <code>--export-iq [secs] [name]</code>).</p>
+</section>
+</div>
+
+<footer><div class="wrap">
+  openGSMTower — provided AS IS, no warranty. IQ captures are simulated for
+  education/testing only; never transmit them over the air.
+</div></footer>
+
+<script>
+(function(){
+  var ctx=null, master=null, timer=null, playing=false;
+  var bandF=1800, bright=1800;
+  function noiseBuffer(c){
+    var len=c.sampleRate*2, buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+    for(var i=0;i<len;i++) d[i]=Math.random()*2-1;
+    return buf;
+  }
+  function start(){
+    ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+    ctx.resume();
+    var src=ctx.createBufferSource(); src.buffer=noiseBuffer(ctx); src.loop=true;
+    var bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=bandF; bp.Q.value=0.7;
+    var vca=ctx.createGain(); vca.gain.value=0.5;
+    var lfo=ctx.createOscillator(); lfo.type="square"; lfo.frequency.value=216.666;
+    var lfoG=ctx.createGain(); lfoG.gain.value=0.38;
+    lfo.connect(lfoG); lfoG.connect(vca.gain);
+    var ring=ctx.createOscillator(); ring.type="sine"; ring.frequency.value=bright;
+    var ringG=ctx.createGain(); ringG.gain.value=0.05;
+    ring.connect(ringG); ringG.connect(master=ctx.createGain());
+    src.connect(bp); bp.connect(vca); vca.connect(master);
+    master.gain.value=document.getElementById("vol").value/100*0.6;
+    src.start(); lfo.start(); ring.start();
+    timer={src:src,lfo:lfo,ring:ring};
+    playing=true;
+    var b=document.getElementById("playBtn"); b.textContent="Stop"; b.className="stop";
+  }
+  function stop(){
+    if(timer){try{timer.src.stop();timer.lfo.stop();timer.ring.stop();}catch(e){}
+      try{master.disconnect();}catch(e){} timer=null;}
+    if(ctx){ctx.close(); ctx=null;} master=null; playing=false;
+    var b=document.getElementById("playBtn"); b.textContent="Play buzz"; b.className="";
+  }
+  document.getElementById("playBtn").addEventListener("click",function(){playing?stop():start();});
+  document.getElementById("vol").addEventListener("input",function(){
+    if(master) master.gain.value=this.value/100*0.6;});
+  var bands=document.querySelectorAll("button.band");
+  bands.forEach(function(el){el.addEventListener("click",function(){
+    bands.forEach(function(x){x.classList.remove("on");}); el.classList.add("on");
+    bandF=parseFloat(el.getAttribute("data-f")); bright=parseFloat(el.getAttribute("data-b"));
+    if(playing){stop();start();}});});
+})();
+</script>
+</body>
+</html>
