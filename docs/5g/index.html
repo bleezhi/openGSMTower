@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>open5GTower — 5G NR gNodeB simulator</title>
+<meta name="description" content="open5GTower synthesizes 5G NR downlink sound and SDR captures: 15/30/60 kHz numerology, SSB ticks, TDD switching buzz, 7.68 MHz IQ export.">
+<link rel="icon" type="image/png" href="../open5GTower.png">
+<style>
+  :root{
+    --bg:#100f19; --panel:#0b0d14; --line:#35324a; --txt:#d7e3f4;
+    --dim:#8b98a9; --vio:#a78bfa; --cyn:#7df9ff; --amb:#ffd479; --grn:#35d07f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:Consolas,"Cascadia Mono",Menlo,monospace;line-height:1.55}
+  a{color:var(--cyn)}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 22px}
+  nav{position:sticky;top:0;background:rgba(16,15,25,.94);border-bottom:1px solid var(--line);z-index:10}
+  nav .wrap{display:flex;align-items:center;gap:18px;padding:12px 22px}
+  nav img{width:30px;height:30px;border-radius:6px}
+  nav b{color:var(--vio);letter-spacing:.5px}
+  nav .sp{flex:1}
+  nav a.nlink{color:var(--dim);text-decoration:none;font-size:14px;margin-left:16px}
+  nav a.nlink:hover{color:var(--txt)}
+  header.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:center;padding:64px 0 46px}
+  header.hero img{width:100%;border-radius:14px;border:1px solid var(--line)}
+  h1{font-size:42px;margin:0 0 10px;color:#fff}
+  h1 span{color:var(--vio)}
+  .tag{color:var(--dim);font-size:17px;margin:0 0 24px}
+  .btn{display:inline-block;padding:12px 22px;border-radius:9px;font-weight:bold;
+    text-decoration:none;margin:0 12px 12px 0;font-size:15px}
+  .btn.g{background:var(--vio);color:#14092b}
+  .btn.o{border:1px solid var(--line);color:var(--txt)}
+  .btn.o:hover{border-color:var(--vio)}
+  .term{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;font-size:13.5px;white-space:pre-wrap;margin-top:18px}
+  .term .g{color:var(--grn)} .term .d{color:var(--dim)}
+  section{padding:40px 0;border-top:1px solid var(--line)}
+  h2{color:var(--vio);font-size:24px;margin:0 0 18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .card h3{margin:0 0 8px;font-size:15px;color:var(--vio)}
+  .card p{margin:0;font-size:13.5px;color:var(--dim)}
+  .specs{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .spec{border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:13px}
+  .spec b{color:var(--amb)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--vio)} td{color:var(--dim)}
+  td:first-child{color:var(--txt)}
+  code{background:#00000055;padding:2px 7px;border-radius:6px;color:var(--amb);font-size:13px}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px;overflow-x:auto;font-size:13px;color:var(--txt)}
+  .demo{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+  .demo .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+  .demo button{background:var(--vio);color:#14092b;border:0;border-radius:8px;
+    padding:10px 20px;font-family:inherit;font-weight:bold;cursor:pointer}
+  .demo button.stop{background:#ff6b6b;color:#3a0a0a}
+  .demo button.pick{background:#1c1830;color:var(--txt);border:1px solid var(--line)}
+  .demo button.pick.on{border-color:var(--vio);color:var(--vio)}
+  .demo input[type=range]{accent-color:var(--vio)}
+  .demo small{color:var(--dim)}
+  footer{padding:30px 0 50px;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+  @media(max-width:760px){header.hero{grid-template-columns:1fr}h1{font-size:32px}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <img src="../open5GTower.png" alt="open5GTower icon">
+  <b>open5GTower</b>
+  <span class="sp"></span>
+  <a class="nlink" href="../">GSM version</a>
+  <a class="nlink" href="#demo">Listen</a>
+  <a class="nlink" href="#features">Features</a>
+  <a class="nlink" href="#download">Download</a>
+  <a class="nlink" href="#build">Build</a>
+</div></nav>
+
+<div class="wrap">
+<header class="hero">
+  <div>
+    <h1>open<span>5G</span>Tower</h1>
+    <p class="tag">The 5G NR gNodeB simulator — TDD switching buzz that tracks
+    numerology, SSB burst ticks, six real bands, and 7.68 MHz IQ captures
+    for your SDR waterfall.</p>
+    <a class="btn g" href="#download">Download for Windows</a>
+    <a class="btn o" href="#demo">Hear it in your browser</a>
+    <div class="term"><span class="d">$ open5GTower.exe --test-synth</span>
+tdd400 x=42.4
+<span class="g">NR-PASS</span> · <span class="g">NRIQ-PASS</span></div>
+  </div>
+  <img src="../open5GTower.png" alt="5G tower artwork">
+</header>
+
+<section id="demo">
+  <h2>// 01 — listen live</h2>
+  <div class="demo">
+    <p style="margin-top:0">OFDM-ish hiss chopped by the DDDSU pattern plus a
+    50 Hz SSB throb. Flip FDD for pure continuous hiss, or raise SCS and hear
+    the switching buzz climb 200 → 400 → 800 Hz. <small>(Keep volume low.)</small></p>
+    <div class="row">
+      <button id="playBtn">Play NR</button>
+      <button class="pick on" id="dupBtn">TDD</button>
+      <button class="pick on" data-tdd="400" data-bp="2500">30 kHz</button>
+      <button class="pick" data-tdd="200" data-bp="1500">15 kHz</button>
+      <button class="pick" data-tdd="800" data-bp="4000">60 kHz</button>
+    </div>
+    <div class="row">
+      <small>Volume</small>
+      <input id="vol" type="range" min="0" max="100" value="30" style="width:200px">
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <h2>// 02 — features</h2>
+  <div class="grid">
+    <div class="card"><h3>Real numerology</h3><p>15/30/60 kHz SCS with correct slot timing — the TDD buzz pitch follows the standard.</p></div>
+    <div class="card"><h3>6 NR bands</h3><p>n28 / n1 / n3 / n7 FDD plus n40 / n78 TDD, duplex auto-detected per band.</p></div>
+    <div class="card"><h3>SSB ticks</h3><p>Burst sets every 10/20/40 ms with a dedicated 20 ms scope view and DDDSU slot LEDs.</p></div>
+    <div class="card"><h3>NR IQ export</h3><p>7.68 MHz captures: band-limited carrier, bright SSB ticks, TDD gating (.cu8 + IQ WAV).</p></div>
+    <div class="card"><h3>Tower-close mode</h3><p>Proximity presets + soft-clipped SDR drive, output picked before Start.</p></div>
+    <div class="card"><h3>C++ disguise</h3><p>Ships as <code>.cpp</code> — compiles as C++ into a stub, runs as Python. Exe needs nothing.</p></div>
+  </div>
+  <div class="specs" style="margin-top:18px">
+    <span class="spec">SCS <b>15/30/60 kHz</b></span>
+    <span class="spec">SSB every <b>10/20/40 ms</b></span>
+    <span class="spec">TDD <b>DDDSU</b></span>
+    <span class="spec">IQ <b>7680000 Hz</b></span>
+  </div>
+</section>
+
+<section id="download">
+  <h2>// 03 — download</h2>
+  <p>Grab <code>open5GTower.exe</code> from the repo releases — standalone,
+  no Python needed. First launch shows the AS-IS license gate, then pick your
+  output device <em>before</em> pressing Start.</p>
+  <a class="btn g" href="#">Get open5GTower.exe</a>
+  <a class="btn o" href="#build">Build it yourself</a>
+  <p style="color:var(--dim);font-size:14px">Want the 2G classic instead?
+  <a href="../">openGSMTower lives here</a>.</p>
+</section>
+
+<section id="build">
+  <h2>// 04 — build from source</h2>
+  <pre>pip install pyinstaller numpy scipy matplotlib sounddevice
+copy open5GTower.cpp open5GTower_app.py
+python -m PyInstaller --noconfirm --clean --onefile --windowed --name open5GTower ^
+  --icon open5GTower.ico --add-data "open5GTower.ico;." ^
+  --hidden-import sounddevice --hidden-import scipy.signal ^
+  --hidden-import scipy.special --collect-all sounddevice open5GTower_app.py</pre>
+  <p style="color:var(--dim);font-size:14px">Or run from source directly:
+  <code>python open5GTower.cpp</code> (flags: <code>--test-synth</code>,
+  <code>--export-nr [secs] [name]</code>).</p>
+</section>
+</div>
+
+<footer><div class="wrap">
+  open5GTower — provided AS IS, no warranty. IQ captures are simulated for
+  education/testing only; never transmit them over the air.
+</div></footer>
+
+<script>
+(function(){
+  var ctx=null, master=null, parts=null, playing=false;
+  var tddF=400, bpF=2500, tddOn=true;
+  function noiseBuffer(c){
+    var len=c.sampleRate*2, buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+    for(var i=0;i<len;i++) d[i]=Math.random()*2-1;
+    return buf;
+  }
+  function start(){
+    ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+    ctx.resume();
+    var src=ctx.createBufferSource(); src.buffer=noiseBuffer(ctx); src.loop=true;
+    var bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=bpF; bp.Q.value=0.6;
+    var vca=ctx.createGain(); vca.gain.value=0.55;
+    master=ctx.createGain();
+    src.connect(bp); bp.connect(vca); vca.connect(master); master.connect(ctx.destination);
+    var mods=[];
+    if(tddOn){
+      var lfo=ctx.createOscillator(); lfo.type="square"; lfo.frequency.value=tddF;
+      var lfoG=ctx.createGain(); lfoG.gain.value=0.35;
+      lfo.connect(lfoG); lfoG.connect(vca.gain); lfo.start(); mods.push(lfo);
+    }
+    var throb=ctx.createOscillator(); throb.type="sine"; throb.frequency.value=50;
+    var throbG=ctx.createGain(); throbG.gain.value=0.12;
+    throb.connect(throbG); throbG.connect(vca.gain); throb.start(); mods.push(throb);
+    master.gain.value=document.getElementById("vol").value/100*0.6;
+    src.start(); mods.push(src);
+    parts=mods;
+    playing=true;
+    var b=document.getElementById("playBtn"); b.textContent="Stop"; b.className="stop";
+  }
+  function stop(){
+    if(parts){parts.forEach(function(n){try{n.stop();}catch(e){}}); parts=null;}
+    if(master){try{master.disconnect();}catch(e){} master=null;}
+    if(ctx){ctx.close(); ctx=null;} playing=false;
+    var b=document.getElementById("playBtn"); b.textContent="Play NR"; b.className="";
+  }
+  document.getElementById("playBtn").addEventListener("click",function(){playing?stop():start();});
+  document.getElementById("vol").addEventListener("input",function(){
+    if(master) master.gain.value=this.value/100*0.6;});
+  document.getElementById("dupBtn").addEventListener("click",function(){
+    tddOn=!tddOn; this.classList.toggle("on",tddOn);
+    this.textContent=tddOn?"TDD":"FDD";
+    if(playing){stop();start();}});
+  var scs=document.querySelectorAll("button.pick[data-tdd]");
+  scs.forEach(function(el){el.addEventListener("click",function(){
+    scs.forEach(function(x){x.classList.remove("on");}); el.classList.add("on");
+    tddF=parseFloat(el.getAttribute("data-tdd")); bpF=parseFloat(el.getAttribute("data-bp"));
+    if(playing){stop();start();}});});
+})();
+</script>
+</body>
+</html>
